@@ -8,9 +8,14 @@ jobs:
       contents: read
       packages: write
     steps:
-      - name: pull gitea from docker hub and push to ghcr
+      - name: pull gitea from docker hub and push to ghcr + swr
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
           docker pull gitea/gitea:1.22.6
+          # push to ghcr
           docker tag gitea/gitea:1.22.6 ghcr.io/www-beroko-com/gitea-bridge:1.22.6
           docker push ghcr.io/www-beroko-com/gitea-bridge:1.22.6
+          # push to SWR
+          echo "${{ secrets.SWR_PASS }}" | docker login -u "${{ secrets.SWR_USER }}" swr.cn-east-3.myhuaweicloud.com --password-stdin
+          docker tag gitea/gitea:1.22.6 swr.cn-east-3.myhuaweicloud.com/beroko/gitea:1.22.6
+          docker push swr.cn-east-3.myhuaweicloud.com/beroko/gitea:1.22.6
