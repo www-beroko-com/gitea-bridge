@@ -1,0 +1,16 @@
+name: mirror-gitea
+on:
+  workflow_dispatch:
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: pull gitea from docker hub and push to ghcr
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker pull gitea/gitea:1.22.6
+          docker tag gitea/gitea:1.22.6 ghcr.io/www-beroko-com/gitea-bridge:1.22.6
+          docker push ghcr.io/www-beroko-com/gitea-bridge:1.22.6
